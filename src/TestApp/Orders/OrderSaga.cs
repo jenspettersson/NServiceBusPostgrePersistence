@@ -24,13 +24,8 @@ namespace TestApp.Orders
         {
             Data.OrderId = message.OrderId;
             log.Info($"Saga with OrderId {Data.OrderId} received StartOrder with OrderId {message.OrderId}");
-            var completeOrder = new CompleteOrder
-            {
-                OrderId = Data.OrderId
-            };
-            await context.SendLocal(completeOrder)
-                .ConfigureAwait(false);
-            await RequestTimeout<CancelOrder>(context, TimeSpan.FromMinutes(30))
+         
+            await RequestTimeout<CancelOrder>(context, TimeSpan.FromSeconds(10))
                 .ConfigureAwait(false);
         }
 

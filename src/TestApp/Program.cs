@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading;
 using System.Threading.Tasks;
 using NServiceBus;
 using NServiceBus.Persistence;
@@ -33,17 +34,36 @@ namespace TestApp
 
             while (true)
             {
-                Console.WriteLine("Write id to start order");
+                Thread.Sleep(1000);
+                Console.WriteLine("Press 1 to start new order and 2 to complete order:");
                 var line = Console.ReadLine();
 
+                switch (line)
+                {
+                    case "x":
+                        break;
+                    case "1":
+                        {
+                            Console.WriteLine("Write id to start order:");
+                            var orderId = Console.ReadLine();
+                            await endpointInstance.SendLocal(new StartOrder { OrderId = orderId });
+
+                            Console.WriteLine($"Started order {orderId}");
+                        }
+                        continue;
+                    case "2":
+                        {
+                            Console.WriteLine("Write id to complete order:");
+                            var orderId = Console.ReadLine();
+                            await endpointInstance.SendLocal(new CompleteOrder { OrderId = orderId });
+
+                            Console.WriteLine($"Sent Complete Order message for: {orderId}");
+                        }
+                        continue;
+                }
                 if (line == "x")
                     break;
-
-                await endpointInstance.SendLocal(new StartOrder {OrderId = line});
-
-                Console.WriteLine($"Started order {line}");
             }
-            
 
             await endpointInstance.Stop().ConfigureAwait(false);
         }
